@@ -336,7 +336,16 @@ let state = JSON.parse(localStorage.getItem('sfk_state') || 'null') || {
   staff: [],
   log: []
 };
+if (!state.cards) {
+  state.cards = { 'Key Card A': null, 'Key Card B': null, 'Key Card C': null };
+}
+if (!state.staff) state.staff = [];
+if (!state.log) state.log = [];
 
+KEYS.forEach(k => {
+  if (!(k in state.cards)) state.cards[k] = null;
+});
+save();
 function save() { localStorage.setItem('sfk_state', JSON.stringify(state)); }
 
 // ── Helpers ────────────────────────────────────────────
