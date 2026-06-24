@@ -496,41 +496,6 @@ function renderLog() {
   }
 }
 
-  // Sort: unreturned first (overdue at very top), then returned sorted by most recent
-  const eodNow = (() => { const d = new Date(); d.setHours(17,0,0,0); return d.getTime(); })();
-  const isExt = (e) => e.due && !e.returned && e.due > eodNow + 86400000 && !isOverdue(e.due);
-  const sorted = [...state.log].sort((a, b) => {
-    if (!a.returned && !b.returned) {
-      // Both out — overdue first, then by checkout time descending
-      const aOver = isOverdue(a.due), bOver = isOverdue(b.due);
-      if (aOver && !bOver) return -1;
-      if (!aOver && bOver) return 1;
-      return b.checkedOut - a.checkedOut;
-    }
-    if (!a.returned) return -1; // a is out, goes first
-    if (!b.returned) return 1;  // b is out, goes first
-    return b.returned - a.returned; // both returned, most recent first
-  });
-
-  b.innerHTML = sorted.map(e => {
-    const overdue = !e.returned && isOverdue(e.due);
-    const extended = isExt(e);
-    const dueClass = overdue ? 'td-due-overdue' : (extended ? 'td-due-extended' : 'td-due-ok');
-    const dueText = e.due ? fmtDate(e.due) + (overdue ? ' ⚠' : '') : 'EOD';
-    const statusPill = e.returned ? 'pill-returned' : (overdue ? 'pill-overdue' : (extended ? 'pill-extended' : 'pill-out'));
-    const statusText = e.returned ? 'Returned' : (overdue ? 'Overdue' : (extended ? 'Extended' : 'Out'));
-    return `
-      <tr>
-        <td class="td-key">${esc(e.key)}</td>
-        <td>${esc(e.name)}</td>
-        <td class="td-muted">${fmt(e.checkedOut)}</td>
-        <td class="${dueClass}">${dueText}</td>
-        <td class="td-muted">${fmt(e.returned)}</td>
-        <td><span class="pill ${statusPill}">${statusText}</span></td>
-      </tr>`;
-  }).join('');
-}
-
 // ── Admin toggle ───────────────────────────────────────
 function toggleAdmin() {
   if (adminUnlocked) {
