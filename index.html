@@ -265,25 +265,44 @@
 
   <hr>
 
-  <!-- Log -->
-  <div class="section-head">
-    <span class="section-label">Log</span>
-  </div>
-  <div class="log-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Key</th>
-          <th>Person</th>
-          <th>Checked out</th>
-          <th>Due back</th>
-          <th>Returned</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="log-body"></tbody>
-    </table>
-  </div>
+<!-- Active Checkouts -->
+<div class="section-head">
+  <span class="section-label">Checked Out</span>
+</div>
+<div class="log-wrap" style="margin-bottom:28px">
+  <table>
+    <thead>
+      <tr>
+        <th>Key</th>
+        <th>Person</th>
+        <th>Checked out</th>
+        <th>Due back</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="active-log-body"></tbody>
+  </table>
+</div>
+
+<!-- Returned Log -->
+<div class="section-head">
+  <span class="section-label">Returned</span>
+</div>
+<div class="log-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Key</th>
+        <th>Person</th>
+        <th>Checked out</th>
+        <th>Due back</th>
+        <th>Returned</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="returned-log-body"></tbody>
+  </table>
+</div>
 
 </div>
 
@@ -432,11 +451,50 @@ function renderAdmin() {
 }
 
 function renderLog() {
-  const b = document.getElementById('log-body');
-  if (!state.log.length) {
-    b.innerHTML = '<tr><td colspan="6" class="log-empty">No checkouts yet.</td></tr>';
-    return;
+  const activeBody = document.getElementById('active-log-body');
+  const returnedBody = document.getElementById('returned-log-body');
+
+  const active = state.log.filter(e => !e.returned);
+  const returned = state.log.filter(e => e.returned);
+
+  if (!active.length) {
+    activeBody.innerHTML = '<tr><td colspan="5" class="log-empty">No keys currently checked out.</td></tr>';
+  } else {
+    activeBody.innerHTML = active.map(e => {
+      const overdue = isOverdue(e.due);
+      const dueClass = overdue ? 'td-due-overdue' : 'td-due-ok';
+      const dueText = e.due ? fmtDate(e.due) + (overdue ? ' ⚠' : '') : 'EOD';
+      const statusPill = overdue ? 'pill-overdue' : 'pill-out';
+      const statusText = overdue ? 'Overdue' : 'Out';
+
+      return `
+        <tr>
+          <td class="td-key">${esc(e.key)}</td>
+          <td>${esc(e.name)}</td>
+          <td class="td-muted">${fmt(e.checkedOut)}</td>
+          <td class="${dueClass}">${dueText}</td>
+          <td><span class="pill ${statusPill}">${statusText}</span></td>
+        </tr>`;
+    }).join('');
   }
+
+  if (!returned.length) {
+    returnedBody.innerHTML = '<tr><td colspan="6" class="log-empty">No returned keys yet.</td></tr>';
+  } else {
+    returnedBody.innerHTML = returned
+      .sort((a, b) => b.returned - a.returned)
+      .map(e => `
+        <tr>
+          <td class="td-key">${esc(e.key)}</td>
+          <td>${esc(e.name)}</td>
+          <td class="td-muted">${fmt(e.checkedOut)}</td>
+          <td class="td-muted">${e.due ? fmtDate(e.due) : 'EOD'}</td>
+          <td class="td-muted">${fmt(e.returned)}</td>
+          <td><span class="pill pill-returned">Returned</span></td>
+        </tr>
+      `).join('');
+  }
+}
 
   // Sort: unreturned first (overdue at very top), then returned sorted by most recent
   const eodNow = (() => { const d = new Date(); d.setHours(17,0,0,0); return d.getTime(); })();
