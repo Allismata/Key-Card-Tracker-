@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SF Spare Keys</title>
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: #e2e0d8;
+    --text: #1a1916;
+    --muted: #7a7870;
+    --accent: #2d5a27;
+    --accent-light: #eaf3e8;
+    --accent-border: #b2d4ae;
+    --warn: #7a3b00;
+    --warn-bg: #fff4e6;
+    --warn-border: #f5c07a;
+    --red: #8b1a1a;
+    --red-bg: #fdf0f0;
+    --red-border: #e8a0a0;
+    --blue: #1a3a6b;
+    --blue-bg: #eef3fb;
+    --blue-border: #a0b8e8;
+    --font: system-ui, -apple-system, sans-serif;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── Header ── */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 28px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-icon {
+    width: 52px; height: 52px; border-radius: 12px;
+    background: #1a1916; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .header-title { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+  .header-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  #clock { font-size: 13px; color: var(--muted); }
+  .btn-admin-toggle {
+    font-size: 12.5px; padding: 7px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--muted); cursor: pointer; font-weight: 500;
+  }
+  .btn-admin-toggle:hover { background: var(--surface2); color: var(--text); }
+  .btn-admin-toggle.active { background: var(--text); color: #fff; border-color: var(--text); }
+
+  /* ── Main ── */
+  .main { padding: 24px 28px 60px; max-width: 1000px; }
+
+  /* ── Cards ── */
+  .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 36px; }
+  @media (max-width: 700px) { .cards-grid { grid-template-columns: 1fr; } }
+
+  .key-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 20px 18px;
+  }
+  .key-card.out { background: var(--warn-bg); border-color: var(--warn-border); }
+  .key-card.overdue { background: var(--red-bg); border-color: var(--red-border); }
+  .key-card.extended { background: var(--blue-bg); border-color: var(--blue-border); }
+
+  .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .card-title { font-size: 16px; font-weight: 700; }
+
+  .pill { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 99px; }
+  .pill-avail { background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent-border); }
+  .pill-out { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+  .pill-overdue { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+  .pill-returned { background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent-border); }
+  .pill-extended { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+
+  .card-row { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .card-row.name { color: var(--text); font-weight: 500; font-size: 14px; }
+  .card-due { font-size: 12px; margin-bottom: 16px; }
+  .card-due.overdue { color: var(--red); font-weight: 600; }
+  .card-due.ok { color: var(--muted); }
+  .card-empty { font-size: 13.5px; color: var(--muted); margin-bottom: 16px; }
+  .card-actions { display: flex; flex-direction: column; gap: 8px; }
+
+  .btn {
+    width: 100%; padding: 9px 14px; border-radius: var(--radius-sm);
+    font-size: 13.5px; font-weight: 600; cursor: pointer;
+    border: 1px solid; display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-checkout { background: var(--surface); border-color: var(--border); color: var(--text); }
+  .btn-checkout:hover { background: var(--surface2); }
+  .btn-return { background: var(--surface); border-color: var(--border); color: var(--text); }
+  .btn-return:hover { background: var(--surface2); }
+  .btn-edit { background: transparent; border-color: var(--border); color: var(--muted); font-size: 12px; padding: 6px 10px; }
+  .btn-edit:hover { background: var(--surface2); color: var(--text); }
+
+  /* ── Section ── */
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+  .btn-add {
+    font-size: 12.5px; font-weight: 500; padding: 5px 12px;
+    border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); cursor: pointer;
+  }
+  .btn-add:hover { background: var(--surface2); }
+
+  /* ── Admin panel ── */
+  .admin-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; margin-bottom: 32px;
+    display: none;
+  }
+  .admin-panel.visible { display: block; }
+  .admin-panel-title {
+    font-size: 11px; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .admin-staff-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .admin-staff-table th {
+    text-align: left; padding: 6px 10px;
+    font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 1px solid var(--border);
+  }
+  .admin-staff-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
+  .admin-staff-table tr:last-child td { border-bottom: none; }
+  .td-id { font-family: monospace; font-size: 12px; color: var(--muted); }
+  .btn-table {
+    font-size: 12px; padding: 4px 10px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer;
+  }
+  .btn-table:hover { background: var(--surface2); color: var(--text); }
+  .btn-table.danger:hover { border-color: var(--red-border); background: var(--red-bg); color: var(--red); }
+  .admin-empty { font-size: 13px; color: var(--muted); padding: 12px 0; }
+
+  /* ── Log ── */
+  .log-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th {
+    padding: 10px 16px; text-align: left;
+    font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 1px solid var(--border); background: var(--surface2);
+  }
+  tbody td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--bg); }
+  .td-key { font-weight: 700; }
+  .td-muted { color: var(--muted); font-size: 13px; }
+  .td-due-overdue { color: var(--red); font-size: 12px; font-weight: 600; }
+  .td-due-ok { color: var(--muted); font-size: 12px; }
+  .td-due-extended { color: #1a3a6b; font-size: 12px; font-weight: 600; }
+  .log-empty { text-align: center; padding: 36px; color: var(--muted); font-size: 13px; }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 0 0 28px; }
+
+  /* ── Modal ── */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(10,10,8,.4);
+    display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px;
+  }
+  .modal {
+    background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
+    padding: 24px; width: 100%; max-width: 340px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.15);
+  }
+  .modal h2 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+  .modal p { font-size: 13px; color: var(--muted); margin-bottom: 18px; line-height: 1.5; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .05em; }
+  .field input, .field select {
+    width: 100%; font-size: 13.5px; padding: 9px 11px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--text); font-family: var(--font); outline: none;
+  }
+  .field input:focus, .field select:focus { border-color: #999; }
+  .field-hint { font-size: 11.5px; color: var(--muted); margin-top: 6px; line-height: 1.55; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 20px; }
+  .btn-primary {
+    flex: 1; padding: 10px; font-size: 13.5px; font-weight: 700;
+    background: var(--text); color: #fff; border: none;
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .btn-primary:hover { opacity: .88; }
+  .btn-cancel {
+    padding: 10px 16px; font-size: 13.5px; font-weight: 500;
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .btn-cancel:hover { background: var(--surface2); }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(8px);
+    background: var(--text); color: #fff; padding: 10px 20px; border-radius: 99px;
+    font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .2s, transform .2s;
+    pointer-events: none; z-index: 200; white-space: nowrap;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Password screen ── */
+  .pw-screen {
+    position: fixed; inset: 0; background: rgba(10,10,8,.5);
+    display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px;
+  }
+  .pw-box {
+    background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
+    padding: 28px; width: 100%; max-width: 300px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.2);
+  }
+  .pw-box h2 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .pw-box p { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+  .pw-error { font-size: 12px; color: var(--red); margin-top: 8px; min-height: 16px; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-icon">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="7" width="26" height="18" rx="3" ry="3" stroke="white" stroke-width="2" fill="none"/>
+        <rect x="3" y="11" width="26" height="4" fill="white" opacity="0.2"/>
+        <rect x="7" y="17" width="6" height="4" rx="1" stroke="white" stroke-width="1.5" fill="none"/>
+        <line x1="10" y1="17" x2="10" y2="21" stroke="white" stroke-width="1" opacity="0.6"/>
+        <line x1="7" y1="19" x2="13" y2="19" stroke="white" stroke-width="1" opacity="0.6"/>
+        <circle cx="20" cy="19" r="1.2" fill="white" opacity="0.7"/>
+        <circle cx="24" cy="19" r="1.2" fill="white" opacity="0.7"/>
+      </svg>
+    </div>
+    <div>
+      <div class="header-title">Office Key Tracker</div>
+      <div class="header-sub">Track who has the keys · SF office</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span id="clock"></span>
+    <button class="btn-admin-toggle" id="admin-btn" onclick="toggleAdmin()">🔒 Admin</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Key cards -->
+  <div class="cards-grid" id="cards-grid"></div>
+
+  <!-- Admin panel (hidden by default) -->
+  <div class="admin-panel" id="admin-panel">
+    <div class="admin-panel-title">
+      🔒 Admin — Staff Directory
+      <button class="btn-add" style="margin-left:auto" onclick="openAddStaff()">+ Add person</button>
+    </div>
+    <div id="admin-staff-content"></div>
+  </div>
+
+  <hr>
+
+  <!-- Log -->
+  <div class="section-head">
+    <span class="section-label">Log</span>
+  </div>
+  <div class="log-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Person</th>
+          <th>Checked out</th>
+          <th>Due back</th>
+          <th>Returned</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="log-body"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Password screen -->
+<div class="pw-screen" id="pw-screen" style="display:none">
+  <div class="pw-box">
+    <h2>Admin access</h2>
+    <p>Enter the admin password to continue.</p>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="pw-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPassword()">
+    </div>
+    <div class="pw-error" id="pw-error"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePwScreen()">Cancel</button>
+      <button class="btn-primary" onclick="checkPassword()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-area"></div>
+<div id="toast"></div>
+
+<script>
+const KEYS = ['Key Card A', 'Key Card B', 'Key Card C'];
+const ADMIN_PASSWORD = 'paradigm2024'; // Change this to your own password
+
+let adminUnlocked = false;
+let state = JSON.parse(localStorage.getItem('sfk_state') || 'null') || {
+  cards: { 'Key Card A': null, 'Key Card B': null, 'Key Card C': null },
+  staff: [],
+  log: []
+};
+
+function save() { localStorage.setItem('sfk_state', JSON.stringify(state)); }
+
+// ── Helpers ────────────────────────────────────────────
+function fmt(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' +
+         d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+function fmtDate(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function esc(s) {
+  return String(s || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/'/g,'&#39;');
+}
+function initials(name) {
+  return name.trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase();
+}
+function toast(msg, dur = 3500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), dur);
+}
+function eodToday() {
+  const d = new Date();
+  d.setHours(17, 0, 0, 0); // 5:00 PM
+  return d.getTime();
+}
+function isOverdue(due) {
+  return due && Date.now() > due;
+}
+
+// ── Render all ─────────────────────────────────────────
+function render() { renderCards(); renderAdmin(); renderLog(); }
+
+function renderCards() {
+  const g = document.getElementById('cards-grid');
+  g.innerHTML = '';
+  KEYS.forEach(k => {
+    const c = state.cards[k];
+    const div = document.createElement('div');
+    const overdue = c && isOverdue(c.due);
+    const isExtended = c && c.due && !overdue && (() => { const eod = new Date(); eod.setHours(17,0,0,0); return c.due > eod.getTime() + 86400000; })();
+    div.className = 'key-card' + (c ? (overdue ? ' overdue' : (isExtended ? ' extended' : ' out')) : '');
+    if (c) {
+      const dueStr = c.due ? fmtDate(c.due) : 'EOD';
+      const dueClass = overdue ? 'overdue' : 'ok';
+      const pillClass = overdue ? 'pill-overdue' : (isExtended ? 'pill-extended' : 'pill-out');
+      const pillText = overdue ? 'Overdue' : (isExtended ? 'Extended' : 'Out');
+      div.innerHTML = `
+        <div class="card-head">
+          <span class="card-title">${esc(k)}</span>
+          <span class="pill ${pillClass}">${pillText}</span>
+        </div>
+        <div class="card-row name">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          ${esc(c.name)}
+        </div>
+        <div class="card-row">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          Since ${fmt(c.checkedOut)}
+        </div>
+        <div class="card-due ${dueClass}" style="margin-bottom:16px;margin-top:2px;padding-left:19px;${isExtended ? 'color:#1a3a6b;font-weight:500' : ''}">
+          Due: ${dueStr}${overdue ? ' — OVERDUE' : ''}
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-return" onclick="returnKey('${esc(k)}')">✓ Return key</button>
+          ${adminUnlocked ? `<button class="btn btn-edit" onclick="openEditDue('${esc(k)}')">✎ Edit due date</button>` : ''}
+        </div>`;
+    } else {
+      div.innerHTML = `
+        <div class="card-head">
+          <span class="card-title">${esc(k)}</span>
+          <span class="pill pill-avail">Available</span>
+        </div>
+        <div class="card-empty">Ready to check out</div>
+        <div class="card-actions">
+          <button class="btn btn-checkout" onclick="openCheckout('${esc(k)}')">Check out</button>
+        </div>`;
+    }
+    g.appendChild(div);
+  });
+}
+
+function renderAdmin() {
+  const panel = document.getElementById('admin-panel');
+  const content = document.getElementById('admin-staff-content');
+  if (!adminUnlocked) { panel.classList.remove('visible'); return; }
+  panel.classList.add('visible');
+
+  if (!state.staff.length) {
+    content.innerHTML = '<div class="admin-empty">No staff added yet.</div>';
+    return;
+  }
+  content.innerHTML = `
+    <table class="admin-staff-table">
+      <thead><tr><th>Name</th><th></th></tr></thead>
+      <tbody>
+        ${state.staff.map(s => `
+          <tr>
+            <td>${esc(s.name)}</td>
+            <td style="display:flex;gap:6px">
+              <button class="btn-table" onclick="openEditStaff('${s.id}')">Edit</button>
+              <button class="btn-table danger" onclick="deleteStaff('${s.id}')">Remove</button>
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderLog() {
+  const b = document.getElementById('log-body');
+  if (!state.log.length) {
+    b.innerHTML = '<tr><td colspan="6" class="log-empty">No checkouts yet.</td></tr>';
+    return;
+  }
+
+  // Sort: unreturned first (overdue at very top), then returned sorted by most recent
+  const eodNow = (() => { const d = new Date(); d.setHours(17,0,0,0); return d.getTime(); })();
+  const isExt = (e) => e.due && !e.returned && e.due > eodNow + 86400000 && !isOverdue(e.due);
+  const sorted = [...state.log].sort((a, b) => {
+    if (!a.returned && !b.returned) {
+      // Both out — overdue first, then by checkout time descending
+      const aOver = isOverdue(a.due), bOver = isOverdue(b.due);
+      if (aOver && !bOver) return -1;
+      if (!aOver && bOver) return 1;
+      return b.checkedOut - a.checkedOut;
+    }
+    if (!a.returned) return -1; // a is out, goes first
+    if (!b.returned) return 1;  // b is out, goes first
+    return b.returned - a.returned; // both returned, most recent first
+  });
+
+  b.innerHTML = sorted.map(e => {
+    const overdue = !e.returned && isOverdue(e.due);
+    const extended = isExt(e);
+    const dueClass = overdue ? 'td-due-overdue' : (extended ? 'td-due-extended' : 'td-due-ok');
+    const dueText = e.due ? fmtDate(e.due) + (overdue ? ' ⚠' : '') : 'EOD';
+    const statusPill = e.returned ? 'pill-returned' : (overdue ? 'pill-overdue' : (extended ? 'pill-extended' : 'pill-out'));
+    const statusText = e.returned ? 'Returned' : (overdue ? 'Overdue' : (extended ? 'Extended' : 'Out'));
+    return `
+      <tr>
+        <td class="td-key">${esc(e.key)}</td>
+        <td>${esc(e.name)}</td>
+        <td class="td-muted">${fmt(e.checkedOut)}</td>
+        <td class="${dueClass}">${dueText}</td>
+        <td class="td-muted">${fmt(e.returned)}</td>
+        <td><span class="pill ${statusPill}">${statusText}</span></td>
+      </tr>`;
+  }).join('');
+}
+
+// ── Admin toggle ───────────────────────────────────────
+function toggleAdmin() {
+  if (adminUnlocked) {
+    adminUnlocked = false;
+    document.getElementById('admin-btn').classList.remove('active');
+    document.getElementById('admin-btn').textContent = '🔒 Admin';
+    render();
+  } else {
+    document.getElementById('pw-screen').style.display = 'flex';
+    setTimeout(() => document.getElementById('pw-input')?.focus(), 50);
+  }
+}
+function closePwScreen() {
+  document.getElementById('pw-screen').style.display = 'none';
+  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-error').textContent = '';
+}
+function checkPassword() {
+  const val = document.getElementById('pw-input').value;
+  if (val === ADMIN_PASSWORD) {
+    adminUnlocked = true;
+    closePwScreen();
+    document.getElementById('admin-btn').classList.add('active');
+    document.getElementById('admin-btn').textContent = '🔓 Admin';
+    render();
+    toast('Admin unlocked');
+  } else {
+    document.getElementById('pw-error').textContent = 'Incorrect password.';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+
+// ── Checkout ───────────────────────────────────────────
+function openCheckout(key) {
+  const todayStr = new Date().toISOString().split('T')[0];
+  const suggestions = state.staff.map(s => `<option value="${esc(s.name)}">`).join('');
+  showModal(`
+    <h2>Check out ${esc(key)}</h2>
+    <p>Who are you giving this key to?</p>
+    <div class="field">
+      <label>Name</label>
+      <input id="co-name" placeholder="e.g. Allison Mata" list="staff-list" autocomplete="off" autofocus>
+      <datalist id="staff-list">${suggestions}</datalist>
+    </div>
+    <div class="field">
+      <label>Due back</label>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button type="button" id="tab-eod" onclick="selectDueTab('eod')"
+          style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #1a1916;background:#1a1916;color:#fff;font-size:13px;font-weight:600;cursor:pointer">EOD</button>
+        <button type="button" id="tab-extend" onclick="selectDueTab('extend')"
+          style="flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer">Extend</button>
+      </div>
+      <div id="extend-picker" style="display:none">
+        <input type="date" id="co-due" value="${todayStr}">
+        <div class="field-hint">Pick the date they need to return it by (due at 5 PM).</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="doCheckout('${esc(key)}')">Check out</button>
+    </div>`);
+}
+
+function selectDueTab(tab) {
+  const eodBtn = document.getElementById('tab-eod');
+  const extBtn = document.getElementById('tab-extend');
+  const picker = document.getElementById('extend-picker');
+  if (tab === 'eod') {
+    eodBtn.style.cssText = 'flex:1;padding:8px;border-radius:8px;border:1.5px solid #1a1916;background:#1a1916;color:#fff;font-size:13px;font-weight:600;cursor:pointer';
+    extBtn.style.cssText = 'flex:1;padding:8px;border-radius:8px;border:1.5px solid #e2e0d8;background:#fff;color:#7a7870;font-size:13px;font-weight:600;cursor:pointer';
+    picker.style.display = 'none';
+  } else {
+    extBtn.style.cssText = 'flex:1;padding:8px;border-radius:8px;border:1.5px solid #1a1916;background:#1a1916;color:#fff;font-size:13px;font-weight:600;cursor:pointer';
+    eodBtn.style.cssText = 'flex:1;padding:8px;border-radius:8px;border:1.5px solid #e2e0d8;background:#fff;color:#7a7870;font-size:13px;font-weight:600;cursor:pointer';
+    picker.style.display = 'block';
+    setTimeout(() => document.getElementById('co-due')?.focus(), 50);
+  }
+}
+
+function doCheckout(key) {
+  const name = document.getElementById('co-name').value.trim();
+  if (!name) { toast('Enter a name'); return; }
+  const extendActive = document.getElementById('extend-picker') && document.getElementById('extend-picker').style.display !== 'none';
+  const dueDateStr = extendActive ? (document.getElementById('co-due') ? document.getElementById('co-due').value : null) : null;
+  const due = (extendActive && dueDateStr) ? (() => { const d = new Date(dueDateStr); d.setHours(17,0,0,0); return d.getTime(); })() : eodToday();
+  // Auto-save to staff list if not already there
+  if (!state.staff.find(s => s.name.toLowerCase() === name.toLowerCase())) {
+    state.staff.push({ id: Date.now() + '', name });
+  }
+  const entry = { id: (Date.now()+1) + '', key, name, checkedOut: Date.now(), due, returned: null };
+  state.cards[key] = { name, checkedOut: entry.checkedOut, due };
+  state.log.push(entry);
+  save(); closeModal(); render();
+  toast(`${key} checked out to ${name}`);
+}
+
+// ── Edit due date ──────────────────────────────────────
+function openEditDue(key) {
+  const c = state.cards[key];
+  if (!c) return;
+  const existing = c.due ? new Date(c.due).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+  showModal(`
+    <h2>Edit due date</h2>
+    <p><strong>${esc(key)}</strong> is checked out to ${esc(c.name)}.</p>
+    <div class="field">
+      <label>Due back</label>
+      <input type="date" id="ed-due" value="${existing}">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="doEditDue('${esc(key)}')">Save</button>
+    </div>`);
+}
+
+function doEditDue(key) {
+  const dueDateStr = document.getElementById('ed-due').value;
+  if (!dueDateStr) { toast('Pick a date'); return; }
+  const due = (() => { const d = new Date(dueDateStr); d.setHours(17,0,0,0); return d.getTime(); })();
+  state.cards[key].due = due;
+  const entry = state.log.find(e => e.key === key && !e.returned);
+  if (entry) entry.due = due;
+  save(); closeModal(); render();
+  toast(`Due date updated`);
+}
+
+// ── Return ─────────────────────────────────────────────
+function returnKey(key) {
+  const entry = state.log.find(e => e.key === key && !e.returned);
+  if (entry) entry.returned = Date.now();
+  state.cards[key] = null;
+  save(); render();
+  toast(`${key} marked as returned ✓`);
+}
+
+// ── Staff ──────────────────────────────────────────────
+function openAddStaff() {
+  showModal(`
+    <h2>Add person</h2>
+    <p>Add a team member to the staff list.</p>
+    <div class="field">
+      <label>Full name</label>
+      <input id="st-name" placeholder="e.g. Allison Mata" autofocus>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="doAddStaff()">Add</button>
+    </div>`);
+}
+
+function openEditStaff(id) {
+  const s = state.staff.find(s => s.id === id);
+  if (!s) return;
+  showModal(`
+    <h2>Edit ${esc(s.name)}</h2>
+    <div class="field">
+      <label>Full name</label>
+      <input id="est-name" value="${esc(s.name)}" autofocus>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="doEditStaff('${id}')">Save</button>
+    </div>`);
+}
+
+function doAddStaff() {
+  const name = document.getElementById('st-name').value.trim();
+  if (!name) { toast('Enter a name'); return; }
+  state.staff.push({ id: Date.now() + '', name });
+  save(); closeModal(); renderAdmin();
+  toast(`${name} added`);
+}
+
+function doEditStaff(id) {
+  const name = document.getElementById('est-name').value.trim();
+  if (!name) { toast('Enter a name'); return; }
+  const s = state.staff.find(s => s.id === id);
+  if (s) { s.name = name; }
+  save(); closeModal(); renderAdmin();
+  toast('Updated');
+}
+
+function deleteStaff(id) {
+  const person = state.staff.find(s => s.id === id);
+  const inUse = KEYS.some(k => state.cards[k]?.name === person?.name);
+  if (inUse) { toast(`${person?.name} has a key out — return it first`); return; }
+  state.staff = state.staff.filter(s => s.id !== id);
+  save(); renderAdmin();
+  toast('Person removed');
+}
+
+// ── Modal helpers ──────────────────────────────────────
+function showModal(html) {
+  document.getElementById('modal-area').innerHTML =
+    `<div class="modal-bg" id="mbg" onclick="if(event.target.id==='mbg')closeModal()"><div class="modal">${html}</div></div>`;
+  setTimeout(() => document.getElementById('modal-area').querySelector('input,select')?.focus(), 50);
+}
+function closeModal() { document.getElementById('modal-area').innerHTML = ''; }
+
+// ── Clock ──────────────────────────────────────────────
+function updateClock() {
+  document.getElementById('clock').textContent =
+    new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + ',  ' +
+    new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+// ── Boot ───────────────────────────────────────────────
+updateClock();
+setInterval(updateClock, 20000);
+render();
+</script>
+</body>
+</html>
