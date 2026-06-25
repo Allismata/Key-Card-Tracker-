@@ -31,7 +31,6 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  /* ── Header ── */
   .header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 20px 28px 16px;
@@ -56,14 +55,21 @@
   .btn-admin-toggle:hover { background: var(--surface2); color: var(--text); }
   .btn-admin-toggle.active { background: var(--text); color: #fff; border-color: var(--text); }
 
-  /* ── Main ── */
-  .main { max-width: 1000px;
-  margin: 0 auto;
-  padding: 24px 28px 60px;}
+  .main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 24px 28px 60px;
+  }
 
-  /* ── Cards ── */
-  .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 36px; }
-  @media (max-width: 700px) { .cards-grid { grid-template-columns: 1fr; } }
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  @media (max-width: 700px) {
+    .cards-grid { grid-template-columns: 1fr; }
+  }
 
   .key-card {
     background: var(--surface); border: 1px solid var(--border);
@@ -103,7 +109,6 @@
   .btn-edit { background: transparent; border-color: var(--border); color: var(--muted); font-size: 12px; padding: 6px 10px; }
   .btn-edit:hover { background: var(--surface2); color: var(--text); }
 
-  /* ── Section ── */
   .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
   .section-label { font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
   .btn-add {
@@ -113,7 +118,6 @@
   }
   .btn-add:hover { background: var(--surface2); }
 
-  /* ── Admin panel ── */
   .admin-panel {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 20px; margin-bottom: 32px;
@@ -133,7 +137,6 @@
   }
   .admin-staff-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
   .admin-staff-table tr:last-child td { border-bottom: none; }
-  .td-id { font-family: monospace; font-size: 12px; color: var(--muted); }
   .btn-table {
     font-size: 12px; padding: 4px 10px; border-radius: var(--radius-sm);
     border: 1px solid var(--border); background: transparent;
@@ -143,7 +146,6 @@
   .btn-table.danger:hover { border-color: var(--red-border); background: var(--red-bg); color: var(--red); }
   .admin-empty { font-size: 13px; color: var(--muted); padding: 12px 0; }
 
-  /* ── Log ── */
   .log-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   thead th {
@@ -161,9 +163,31 @@
   .td-due-extended { color: #1a3a6b; font-size: 12px; font-weight: 600; }
   .log-empty { text-align: center; padding: 36px; color: var(--muted); font-size: 13px; }
 
+  .status-cell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 140px;
+  }
+  .status-cell .pill {
+    min-width: 90px;
+    text-align: center;
+  }
+  .row-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--muted);
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .row-toggle:hover { background: var(--surface2); color: var(--text); }
+
   hr { border: none; border-top: 1px solid var(--border); margin: 0 0 28px; }
 
-  /* ── Modal ── */
   .modal-bg {
     position: fixed; inset: 0; background: rgba(10,10,8,.4);
     display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px;
@@ -198,7 +222,6 @@
   }
   .btn-cancel:hover { background: var(--surface2); }
 
-  /* ── Toast ── */
   #toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(8px);
     background: var(--text); color: #fff; padding: 10px 20px; border-radius: 99px;
@@ -207,7 +230,6 @@
   }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* ── Password screen ── */
   .pw-screen {
     position: fixed; inset: 0; background: rgba(10,10,8,.5);
     display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px;
@@ -224,7 +246,6 @@
 </head>
 <body>
 
-<!-- Header -->
 <div class="header">
   <div class="header-left">
     <div class="header-icon">
@@ -251,10 +272,8 @@
 
 <div class="main">
 
-  <!-- Key cards -->
   <div class="cards-grid" id="cards-grid"></div>
 
-  <!-- Admin panel (hidden by default) -->
   <div class="admin-panel" id="admin-panel">
     <div class="admin-panel-title">
       🔒 Admin — Staff Directory
@@ -265,48 +284,45 @@
 
   <hr>
 
-<!-- Active Checkouts -->
-<div class="section-head">
-  <span class="section-label">Checked Out</span>
-</div>
-<div class="log-wrap" style="margin-bottom:28px">
-  <table>
-    <thead>
-      <tr>
-        <th>Key</th>
-        <th>Person</th>
-        <th>Checked out</th>
-        <th>Due back</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody id="active-log-body"></tbody>
-  </table>
-</div>
+  <div class="section-head">
+    <span class="section-label">Checked Out</span>
+  </div>
+  <div class="log-wrap" style="margin-bottom:28px">
+    <table>
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Person</th>
+          <th>Checked out</th>
+          <th>Due back</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="active-log-body"></tbody>
+    </table>
+  </div>
 
-<!-- Returned Log -->
-<div class="section-head">
-  <span class="section-label">Returned</span>
-</div>
-<div class="log-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th>Key</th>
-        <th>Person</th>
-        <th>Checked out</th>
-        <th>Due back</th>
-        <th>Returned</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody id="returned-log-body"></tbody>
-  </table>
-</div>
+  <div class="section-head">
+    <span class="section-label">Returned</span>
+  </div>
+  <div class="log-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Person</th>
+          <th>Checked out</th>
+          <th>Due back</th>
+          <th>Returned</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="returned-log-body"></tbody>
+    </table>
+  </div>
 
 </div>
 
-<!-- Password screen -->
 <div class="pw-screen" id="pw-screen" style="display:none">
   <div class="pw-box">
     <h2>Admin access</h2>
@@ -328,7 +344,7 @@
 
 <script>
 const KEYS = ['Key Card A', 'Key Card B', 'Key Card C'];
-const ADMIN_PASSWORD = 'paradigm2024'; // Change this to your own password
+const ADMIN_PASSWORD = 'paradigm2024';
 
 let adminUnlocked = false;
 let state = JSON.parse(localStorage.getItem('sfk_state') || 'null') || {
@@ -336,68 +352,77 @@ let state = JSON.parse(localStorage.getItem('sfk_state') || 'null') || {
   staff: [],
   log: []
 };
-if (!state.cards) {
-  state.cards = { 'Key Card A': null, 'Key Card B': null, 'Key Card C': null };
+
+function save() {
+  localStorage.setItem('sfk_state', JSON.stringify(state));
 }
-if (!state.staff) state.staff = [];
-if (!state.log) state.log = [];
 
-KEYS.forEach(k => {
-  if (!(k in state.cards)) state.cards[k] = null;
-});
-save();
-function save() { localStorage.setItem('sfk_state', JSON.stringify(state)); }
-
-// ── Helpers ────────────────────────────────────────────
 function fmt(ts) {
   if (!ts) return '—';
   const d = new Date(ts);
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' +
          d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 }
+
 function fmtDate(ts) {
   if (!ts) return '—';
   return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
+
 function esc(s) {
   return String(s || '')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/'/g,'&#39;');
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/'/g,'&#39;');
 }
-function initials(name) {
-  return name.trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase();
-}
+
 function toast(msg, dur = 3500) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), dur);
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), dur);
 }
+
 function eodToday() {
   const d = new Date();
-  d.setHours(17, 0, 0, 0); // 5:00 PM
+  d.setHours(17, 0, 0, 0);
   return d.getTime();
 }
+
 function isOverdue(due) {
   return due && Date.now() > due;
 }
 
-// ── Render all ─────────────────────────────────────────
-function render() { renderCards(); renderAdmin(); renderLog(); }
+function render() {
+  renderCards();
+  renderAdmin();
+  renderLog();
+}
 
 function renderCards() {
   const g = document.getElementById('cards-grid');
   g.innerHTML = '';
+
   KEYS.forEach(k => {
     const c = state.cards[k];
     const div = document.createElement('div');
     const overdue = c && isOverdue(c.due);
-    const isExtended = c && c.due && !overdue && (() => { const eod = new Date(); eod.setHours(17,0,0,0); return c.due > eod.getTime() + 86400000; })();
+    const isExtended = c && c.due && !overdue && (() => {
+      const eod = new Date();
+      eod.setHours(17,0,0,0);
+      return c.due > eod.getTime() + 86400000;
+    })();
+
     div.className = 'key-card' + (c ? (overdue ? ' overdue' : (isExtended ? ' extended' : ' out')) : '');
+
     if (c) {
       const dueStr = c.due ? fmtDate(c.due) : 'EOD';
       const dueClass = overdue ? 'overdue' : 'ok';
       const pillClass = overdue ? 'pill-overdue' : (isExtended ? 'pill-extended' : 'pill-out');
       const pillText = overdue ? 'Overdue' : (isExtended ? 'Extended' : 'Out');
+
       div.innerHTML = `
         <div class="card-head">
           <span class="card-title">${esc(k)}</span>
@@ -415,7 +440,7 @@ function renderCards() {
           Due: ${dueStr}${overdue ? ' — OVERDUE' : ''}
         </div>
         <div class="card-actions">
-          <button class="btn btn-return" onclick="returnKey('${esc(k)}')">✓ Return key</button>
+          <button class="btn btn-return" onclick="openReturn('${esc(k)}')">✓ Return key</button>
           ${adminUnlocked ? `<button class="btn btn-edit" onclick="openEditDue('${esc(k)}')">✎ Edit due date</button>` : ''}
         </div>`;
     } else {
@@ -429,6 +454,7 @@ function renderCards() {
           <button class="btn btn-checkout" onclick="openCheckout('${esc(k)}')">Check out</button>
         </div>`;
     }
+
     g.appendChild(div);
   });
 }
@@ -436,13 +462,19 @@ function renderCards() {
 function renderAdmin() {
   const panel = document.getElementById('admin-panel');
   const content = document.getElementById('admin-staff-content');
-  if (!adminUnlocked) { panel.classList.remove('visible'); return; }
+
+  if (!adminUnlocked) {
+    panel.classList.remove('visible');
+    return;
+  }
+
   panel.classList.add('visible');
 
   if (!state.staff.length) {
     content.innerHTML = '<div class="admin-empty">No staff added yet.</div>';
     return;
   }
+
   content.innerHTML = `
     <table class="admin-staff-table">
       <thead><tr><th>Name</th><th></th></tr></thead>
@@ -463,8 +495,19 @@ function renderLog() {
   const activeBody = document.getElementById('active-log-body');
   const returnedBody = document.getElementById('returned-log-body');
 
-  const active = state.log.filter(e => !e.returned);
-  const returned = state.log.filter(e => e.returned);
+  const active = state.log
+    .filter(e => !e.returned)
+    .sort((a, b) => {
+      const aOver = isOverdue(a.due);
+      const bOver = isOverdue(b.due);
+      if (aOver && !bOver) return -1;
+      if (!aOver && bOver) return 1;
+      return b.checkedOut - a.checkedOut;
+    });
+
+  const returned = state.log
+    .filter(e => e.returned)
+    .sort((a, b) => b.returned - a.returned);
 
   if (!active.length) {
     activeBody.innerHTML = '<tr><td colspan="5" class="log-empty">No keys currently checked out.</td></tr>';
@@ -475,6 +518,7 @@ function renderLog() {
       const dueText = e.due ? fmtDate(e.due) + (overdue ? ' ⚠' : '') : 'EOD';
       const statusPill = overdue ? 'pill-overdue' : 'pill-out';
       const statusText = overdue ? 'Overdue' : 'Out';
+      const rowId = 'row-active-' + e.id;
 
       return `
         <tr>
@@ -482,7 +526,18 @@ function renderLog() {
           <td>${esc(e.name)}</td>
           <td class="td-muted">${fmt(e.checkedOut)}</td>
           <td class="${dueClass}">${dueText}</td>
-          <td><span class="pill ${statusPill}">${statusText}</span></td>
+          <td>
+            <div class="status-cell">
+              <span class="pill ${statusPill}">${statusText}</span>
+              <button class="row-toggle" onclick="toggleRowDetail('${rowId}')">▾</button>
+            </div>
+          </td>
+        </tr>
+        <tr id="${rowId}" style="display:none;background:var(--surface2)">
+          <td colspan="5" style="padding:8px 16px 10px 32px;font-size:12px;color:var(--muted)">
+            <span style="margin-right:20px"><strong>Checked out by:</strong> ${esc(e.checkedOutBy || '—')}</span>
+            <span><strong>Returned by:</strong> ${esc(e.returnedBy || '—')}</span>
+          </td>
         </tr>`;
     }).join('');
   }
@@ -490,22 +545,39 @@ function renderLog() {
   if (!returned.length) {
     returnedBody.innerHTML = '<tr><td colspan="6" class="log-empty">No returned keys yet.</td></tr>';
   } else {
-    returnedBody.innerHTML = returned
-      .sort((a, b) => b.returned - a.returned)
-      .map(e => `
+    returnedBody.innerHTML = returned.map(e => {
+      const rowId = 'row-returned-' + e.id;
+
+      return `
         <tr>
           <td class="td-key">${esc(e.key)}</td>
           <td>${esc(e.name)}</td>
           <td class="td-muted">${fmt(e.checkedOut)}</td>
           <td class="td-muted">${e.due ? fmtDate(e.due) : 'EOD'}</td>
           <td class="td-muted">${fmt(e.returned)}</td>
-          <td><span class="pill pill-returned">Returned</span></td>
+          <td>
+            <div class="status-cell">
+              <span class="pill pill-returned">Returned</span>
+              <button class="row-toggle" onclick="toggleRowDetail('${rowId}')">▾</button>
+            </div>
+          </td>
         </tr>
-      `).join('');
+        <tr id="${rowId}" style="display:none;background:var(--surface2)">
+          <td colspan="6" style="padding:8px 16px 10px 32px;font-size:12px;color:var(--muted)">
+            <span style="margin-right:20px"><strong>Checked out by:</strong> ${esc(e.checkedOutBy || '—')}</span>
+            <span><strong>Returned by:</strong> ${esc(e.returnedBy || '—')}</span>
+          </td>
+        </tr>`;
+    }).join('');
   }
 }
 
-// ── Admin toggle ───────────────────────────────────────
+function toggleRowDetail(id) {
+  const row = document.getElementById(id);
+  if (!row) return;
+  row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+}
+
 function toggleAdmin() {
   if (adminUnlocked) {
     adminUnlocked = false;
@@ -517,13 +589,16 @@ function toggleAdmin() {
     setTimeout(() => document.getElementById('pw-input')?.focus(), 50);
   }
 }
+
 function closePwScreen() {
   document.getElementById('pw-screen').style.display = 'none';
   document.getElementById('pw-input').value = '';
   document.getElementById('pw-error').textContent = '';
 }
+
 function checkPassword() {
   const val = document.getElementById('pw-input').value;
+
   if (val === ADMIN_PASSWORD) {
     adminUnlocked = true;
     closePwScreen();
@@ -538,17 +613,24 @@ function checkPassword() {
   }
 }
 
-// ── Checkout ───────────────────────────────────────────
 function openCheckout(key) {
   const todayStr = new Date().toISOString().split('T')[0];
   const suggestions = state.staff.map(s => `<option value="${esc(s.name)}">`).join('');
+
   showModal(`
     <h2>Check out ${esc(key)}</h2>
     <p>Who are you giving this key to?</p>
     <div class="field">
       <label>Name</label>
-      <input id="co-name" placeholder="e.g. Allison Mata" list="staff-list" autocomplete="off" autofocus>
+      <input id="co-name" list="staff-list" autocomplete="off" autofocus>
       <datalist id="staff-list">${suggestions}</datalist>
+    </div>
+    <div class="field">
+      <label>Checked out by</label>
+      <select id="co-by">
+        <option value="">Select person</option>
+        ${state.staff.map(s => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('')}
+      </select>
     </div>
     <div class="field">
       <label>Due back</label>
@@ -573,6 +655,7 @@ function selectDueTab(tab) {
   const eodBtn = document.getElementById('tab-eod');
   const extBtn = document.getElementById('tab-extend');
   const picker = document.getElementById('extend-picker');
+
   if (tab === 'eod') {
     eodBtn.style.cssText = 'flex:1;padding:8px;border-radius:8px;border:1.5px solid #1a1916;background:#1a1916;color:#fff;font-size:13px;font-weight:600;cursor:pointer';
     extBtn.style.cssText = 'flex:1;padding:8px;border-radius:8px;border:1.5px solid #e2e0d8;background:#fff;color:#7a7870;font-size:13px;font-weight:600;cursor:pointer';
@@ -587,26 +670,48 @@ function selectDueTab(tab) {
 
 function doCheckout(key) {
   const name = document.getElementById('co-name').value.trim();
+  const checkedOutBy = document.getElementById('co-by').value.trim();
+
   if (!name) { toast('Enter a name'); return; }
+  if (!checkedOutBy) { toast('Select who checked it out'); return; }
+
   const extendActive = document.getElementById('extend-picker') && document.getElementById('extend-picker').style.display !== 'none';
   const dueDateStr = extendActive ? (document.getElementById('co-due') ? document.getElementById('co-due').value : null) : null;
-  const due = (extendActive && dueDateStr) ? (() => { const d = new Date(dueDateStr); d.setHours(17,0,0,0); return d.getTime(); })() : eodToday();
-  // Auto-save to staff list if not already there
+  const due = (extendActive && dueDateStr) ? (() => {
+    const d = new Date(dueDateStr);
+    d.setHours(17,0,0,0);
+    return d.getTime();
+  })() : eodToday();
+
   if (!state.staff.find(s => s.name.toLowerCase() === name.toLowerCase())) {
     state.staff.push({ id: Date.now() + '', name });
   }
-  const entry = { id: (Date.now()+1) + '', key, name, checkedOut: Date.now(), due, returned: null };
+
+  const entry = {
+    id: (Date.now()+1) + '',
+    key,
+    name,
+    checkedOut: Date.now(),
+    due,
+    returned: null,
+    checkedOutBy,
+    returnedBy: null
+  };
+
   state.cards[key] = { name, checkedOut: entry.checkedOut, due };
   state.log.push(entry);
-  save(); closeModal(); render();
+  save();
+  closeModal();
+  render();
   toast(`${key} checked out to ${name}`);
 }
 
-// ── Edit due date ──────────────────────────────────────
 function openEditDue(key) {
   const c = state.cards[key];
   if (!c) return;
+
   const existing = c.due ? new Date(c.due).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+
   showModal(`
     <h2>Edit due date</h2>
     <p><strong>${esc(key)}</strong> is checked out to ${esc(c.name)}.</p>
@@ -623,31 +728,68 @@ function openEditDue(key) {
 function doEditDue(key) {
   const dueDateStr = document.getElementById('ed-due').value;
   if (!dueDateStr) { toast('Pick a date'); return; }
-  const due = (() => { const d = new Date(dueDateStr); d.setHours(17,0,0,0); return d.getTime(); })();
+
+  const due = (() => {
+    const d = new Date(dueDateStr);
+    d.setHours(17,0,0,0);
+    return d.getTime();
+  })();
+
   state.cards[key].due = due;
+
   const entry = state.log.find(e => e.key === key && !e.returned);
   if (entry) entry.due = due;
-  save(); closeModal(); render();
-  toast(`Due date updated`);
+
+  save();
+  closeModal();
+  render();
+  toast('Due date updated');
 }
 
-// ── Return ─────────────────────────────────────────────
-function returnKey(key) {
+function openReturn(key) {
+  const c = state.cards[key];
+  if (!c) return;
+
+  showModal(`
+    <h2>Return ${esc(key)}</h2>
+    <p>Who is marking this key as returned?</p>
+    <div class="field">
+      <label>Returned by</label>
+      <select id="ret-by" autofocus>
+        <option value="">Select person</option>
+        ${state.staff.map(s => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="doReturn('${esc(key)}')">Return key</button>
+    </div>`);
+}
+
+function doReturn(key) {
+  const returnedBy = document.getElementById('ret-by').value.trim();
+  if (!returnedBy) { toast('Select who returned it'); return; }
+
   const entry = state.log.find(e => e.key === key && !e.returned);
-  if (entry) entry.returned = Date.now();
+  if (entry) {
+    entry.returned = Date.now();
+    entry.returnedBy = returnedBy;
+  }
+
   state.cards[key] = null;
-  save(); render();
+  save();
+  closeModal();
+  render();
   toast(`${key} marked as returned ✓`);
 }
 
-// ── Staff ──────────────────────────────────────────────
 function openAddStaff() {
   showModal(`
     <h2>Add person</h2>
     <p>Add a team member to the staff list.</p>
     <div class="field">
       <label>Full name</label>
-      <input id="st-name" placeholder="e.g. Allison Mata" autofocus>
+      <input id="st-name" autofocus>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -658,6 +800,7 @@ function openAddStaff() {
 function openEditStaff(id) {
   const s = state.staff.find(s => s.id === id);
   if (!s) return;
+
   showModal(`
     <h2>Edit ${esc(s.name)}</h2>
     <div class="field">
@@ -673,45 +816,59 @@ function openEditStaff(id) {
 function doAddStaff() {
   const name = document.getElementById('st-name').value.trim();
   if (!name) { toast('Enter a name'); return; }
+
   state.staff.push({ id: Date.now() + '', name });
-  save(); closeModal(); renderAdmin();
+  save();
+  closeModal();
+  renderAdmin();
   toast(`${name} added`);
 }
 
 function doEditStaff(id) {
   const name = document.getElementById('est-name').value.trim();
   if (!name) { toast('Enter a name'); return; }
+
   const s = state.staff.find(s => s.id === id);
-  if (s) { s.name = name; }
-  save(); closeModal(); renderAdmin();
+  if (s) s.name = name;
+
+  save();
+  closeModal();
+  renderAdmin();
   toast('Updated');
 }
 
 function deleteStaff(id) {
   const person = state.staff.find(s => s.id === id);
   const inUse = KEYS.some(k => state.cards[k]?.name === person?.name);
-  if (inUse) { toast(`${person?.name} has a key out — return it first`); return; }
+
+  if (inUse) {
+    toast(`${person?.name} has a key out — return it first`);
+    return;
+  }
+
   state.staff = state.staff.filter(s => s.id !== id);
-  save(); renderAdmin();
+  save();
+  renderAdmin();
   toast('Person removed');
 }
 
-// ── Modal helpers ──────────────────────────────────────
 function showModal(html) {
   document.getElementById('modal-area').innerHTML =
     `<div class="modal-bg" id="mbg" onclick="if(event.target.id==='mbg')closeModal()"><div class="modal">${html}</div></div>`;
+
   setTimeout(() => document.getElementById('modal-area').querySelector('input,select')?.focus(), 50);
 }
-function closeModal() { document.getElementById('modal-area').innerHTML = ''; }
 
-// ── Clock ──────────────────────────────────────────────
+function closeModal() {
+  document.getElementById('modal-area').innerHTML = '';
+}
+
 function updateClock() {
   document.getElementById('clock').textContent =
     new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + ',  ' +
     new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 }
 
-// ── Boot ───────────────────────────────────────────────
 updateClock();
 setInterval(updateClock, 20000);
 render();
